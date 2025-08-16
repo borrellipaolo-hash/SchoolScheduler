@@ -1,0 +1,188 @@
+﻿<Window x:Class="SchoolScheduler.GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SchoolScheduler.GUI"
+        mc:Ignorable="d"
+        Title="School Scheduler" Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen">
+
+    <!-- AGGIUNGI QUESTA SEZIONE -->
+    <Window.Resources>
+        <!-- <local:SetToStringConverter x:Key="SetToStringConverter"/> -->
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <ToolBar Grid.Row="0" Height="40">
+            <Button Name="btnTestEngine" Click="TestEngine_Click" Padding="10,5">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Test Engine" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Separator/>
+            <Button Name="btnConfiguration" Click="Configuration_Click" Padding="10,5">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="⚙ Configurazione" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Separator/>
+            <Button Name="btnConstraints" Click="Constraints_Click" Padding="10,5">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="📋 Vincoli" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Separator/>
+            <Button Name="btnImport" Click="ImportExcel_Click" Padding="10,5">
+                <TextBlock Text="Import Excel"/>
+            </Button>
+            <Button Name="btnGenerate" Click="GenerateSchedule_Click" Padding="10,5">
+                <TextBlock Text="▶ Genera Orario" FontWeight="Bold"/>
+            </Button>
+            <Separator/>
+            <Label Content="Sheet Name:"/>
+            <TextBox Name="txtSheetName" Width="100" VerticalAlignment="Center" Text="Scientifico2"/>
+        </ToolBar>
+
+        <!-- Main Content -->
+        <TabControl Name="tabControl" Grid.Row="1" Margin="5">
+            <TabItem Header="Activities">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
+                        <Label Content="Totale Attività:"/>
+                        <Label Name="lblActivityCount" Content="0" FontWeight="Bold"/>
+                        <Label Content="Filtro:" Margin="20,0,5,0"/>
+                        <TextBox Name="txtFilter" Width="200" TextChanged="FilterActivities_TextChanged"/>
+                    </StackPanel>
+
+                    <DataGrid Name="dgActivities" Grid.Row="1" 
+         AutoGenerateColumns="False" 
+         CanUserAddRows="False"
+         CanUserDeleteRows="False"
+         Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
+                            <DataGridTextColumn Header="Docente" Binding="{Binding TeacherFullName}" Width="150"/>
+                            <DataGridTextColumn Header="CdC" Binding="{Binding ClassCode}" Width="60"/>
+                            <DataGridTextColumn Header="Classe" Binding="{Binding ClassName}" Width="60"/>
+                            <DataGridTextColumn Header="Materia" Binding="{Binding Subject}" Width="150"/>
+                            <DataGridTextColumn Header="Ore" Binding="{Binding WeeklyHours}" Width="40"/>
+                            <DataGridTextColumn Header="Gruppo" Binding="{Binding ArticulationGroup}" Width="60">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                            <Trigger Property="Text" Value="{x:Null}">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Background" Value="LightYellow"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Teachers">
+                <DataGrid Name="dgTeachers" 
+                         AutoGenerateColumns="False"
+                         CanUserAddRows="False"
+                         CanUserDeleteRows="False"
+                         Margin="5">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
+                        <DataGridTextColumn Header="Cognome" Binding="{Binding Surname}" Width="100"/>
+                        <DataGridTextColumn Header="Nome" Binding="{Binding Name}" Width="100"/>
+                        <DataGridTextColumn Header="Ore Totali" Binding="{Binding TotalWeeklyHours}" Width="80"/>
+                        <DataGridTextColumn Header="Classi di Concorso" 
+                                          Binding="{Binding ClassCodes}" 
+                                          Width="150"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="Classes">
+                <DataGrid Name="dgClasses" 
+                         AutoGenerateColumns="False"
+                         CanUserAddRows="False"
+                         CanUserDeleteRows="False"
+                         Margin="5">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
+                        <DataGridTextColumn Header="Classe" Binding="{Binding Name}" Width="80"/>
+                        <DataGridTextColumn Header="Ore Totali" Binding="{Binding TotalWeeklyHours}" Width="80"/>
+                        <DataGridCheckBoxColumn Header="Articolata" Binding="{Binding HasArticulation}" Width="70"/>
+                        <DataGridTextColumn Header="N° Attività" 
+                                          Binding="{Binding Activities.Count}" 
+                                          Width="80"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="Constraints">
+                <TextBlock Text="Constraints configuration will go here" Margin="10"/>
+            </TabItem>
+
+            <TabItem Header="Schedule View">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Controlli di selezione -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
+                        <Label Content="Visualizza:"/>
+                        <RadioButton Name="rbViewClass" Content="Per Classe" IsChecked="True" 
+                        Checked="ViewModeChanged" Margin="5,0"/>
+                        <RadioButton Name="rbViewTeacher" Content="Per Docente" 
+                        Checked="ViewModeChanged" Margin="5,0"/>
+                        <Label Content="Seleziona:" Margin="20,0,5,0"/>
+                        <ComboBox Name="cmbScheduleSelector" Width="150" 
+                     SelectionChanged="ScheduleSelector_Changed"/>
+                        <Button Name="btnExportSchedule" Content="Esporta Excel" 
+                   Margin="20,0,0,0" Padding="10,2" Click="ExportSchedule_Click"/>
+                        <Button Name="btnPrintSchedule" Content="Stampa" 
+                   Margin="10,0,0,0" Padding="10,2" Click="PrintSchedule_Click"/>
+                    </StackPanel>
+
+                    <!-- Griglia orario -->
+                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" 
+                     VerticalScrollBarVisibility="Auto">
+                        <Grid Name="grdSchedule" Margin="5">
+                            <!-- Popolato dinamicamente -->
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="2">
+            <StatusBarItem>
+                <TextBlock Name="txtStatus" Text="Ready"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock Name="txtStats" Text=""/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

@@ -1,0 +1,132 @@
+﻿<Window x:Class="SchoolScheduler.GUI.Views.ConfigurationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Configurazione Generale" Height="500" Width="600"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Giorni di scuola -->
+                <GroupBox Header="Giorni di Scuola" Margin="0,0,0,10">
+                    <StackPanel Margin="10">
+                        <RadioButton Name="rbFiveDays" GroupName="Days" IsChecked="True" 
+                                   Content="5 giorni (Lunedì-Venerdì)" 
+                                   Checked="FiveDays_Checked"/>
+                        <RadioButton Name="rbSixDays" GroupName="Days" 
+                                   Content="6 giorni (Lunedì-Sabato)" 
+                                   Margin="0,5,0,0"
+                                   Checked="SixDays_Checked"/>
+
+                        <StackPanel Name="pnlExcludedDay" Orientation="Horizontal" Margin="20,10,0,0">
+                            <Label Content="Giorno escluso:"/>
+                            <ComboBox Name="cmbExcludedDay" Width="120">
+                                <ComboBoxItem Content="Sabato" Tag="Saturday" IsSelected="True"/>
+                                <ComboBoxItem Content="Venerdì" Tag="Friday"/>
+                                <ComboBoxItem Content="Lunedì" Tag="Monday"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Orario -->
+                <GroupBox Header="Orario Lezioni" Margin="0,0,0,10">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="120"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Content="Ora inizio lezioni:" Grid.Row="0" Grid.Column="0"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
+                            <ComboBox Name="cmbStartHour" Width="50">
+                                <!-- Popolato nel code-behind -->
+                            </ComboBox>
+                            <Label Content=":"/>
+                            <ComboBox Name="cmbStartMinute" Width="50">
+                                <ComboBoxItem Content="00" IsSelected="True"/>
+                                <ComboBoxItem Content="15"/>
+                                <ComboBoxItem Content="30"/>
+                                <ComboBoxItem Content="45"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <Label Content="Durata lezione:" Grid.Row="1" Grid.Column="0" Margin="0,5,0,0"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" Margin="0,5,0,0">
+                            <ComboBox Name="cmbLessonDuration" Width="60">
+                                <ComboBoxItem Content="50" Tag="50"/>
+                                <ComboBoxItem Content="55" Tag="55"/>
+                                <ComboBoxItem Content="60" Tag="60" IsSelected="True"/>
+                            </ComboBox>
+                            <Label Content="minuti"/>
+                        </StackPanel>
+
+                        <Label Content="Max ore/giorno:" Grid.Row="2" Grid.Column="0" Margin="0,5,0,0"/>
+                        <ComboBox Name="cmbMaxDailyHours" Width="60" Grid.Row="2" Grid.Column="1" Margin="0,5,0,0">
+                            <ComboBoxItem Content="5"/>
+                            <ComboBoxItem Content="6" IsSelected="True"/>
+                            <ComboBoxItem Content="7"/>
+                            <ComboBoxItem Content="8"/>
+                        </ComboBox>
+
+                        <Label Content="Min ore/giorno:" Grid.Row="3" Grid.Column="0" Margin="0,5,0,0"/>
+                        <ComboBox Name="cmbMinDailyHours" Width="60" Grid.Row="3" Grid.Column="1" Margin="0,5,0,0">
+                            <ComboBoxItem Content="2" IsSelected="True"/>
+                            <ComboBoxItem Content="3"/>
+                            <ComboBoxItem Content="4"/>
+                            <ComboBoxItem Content="5"/>
+                        </ComboBox>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Intervalli (per ora disabilitato) -->
+                <GroupBox Header="Intervalli (Futura implementazione)" Margin="0,0,0,10" IsEnabled="False">
+                    <StackPanel Margin="10">
+                        <CheckBox Content="Ricreazione dopo la 2° ora (15 minuti)"/>
+                        <CheckBox Content="Ricreazione dopo la 4° ora (15 minuti)" Margin="0,5,0,0"/>
+                        <CheckBox Content="Pausa pranzo dopo la 5° ora (60 minuti)" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- File di configurazione -->
+                <GroupBox Header="Salvataggio Configurazione" Margin="0,0,0,10">
+                    <StackPanel Margin="10">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Name="btnSaveConfig" Content="Salva Configurazione" 
+                                   Width="130" Click="SaveConfig_Click"/>
+                            <Button Name="btnLoadConfig" Content="Carica Configurazione" 
+                                   Width="130" Margin="10,0,0,0" Click="LoadConfig_Click"/>
+                            <Button Name="btnDefaultConfig" Content="Ripristina Default" 
+                                   Width="130" Margin="10,0,0,0" Click="DefaultConfig_Click"/>
+                        </StackPanel>
+                        <TextBlock Name="txtConfigStatus" Margin="0,10,0,0" 
+                                  FontStyle="Italic" Foreground="Green"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Pulsanti di azione -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" 
+                   HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Name="btnOK" Content="OK" Width="80" IsDefault="True" Click="OK_Click"/>
+            <Button Name="btnCancel" Content="Annulla" Width="80" 
+                   Margin="10,0,0,0" IsCancel="True" Click="Cancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

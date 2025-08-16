@@ -1,0 +1,352 @@
+﻿<Window x:Class="SchoolScheduler.GUI.Views.ConstraintsEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Editor Vincoli" Height="600" Width="900"
+        WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Lista vincoli a sinistra -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Content="Vincoli Definiti" FontWeight="Bold" Margin="5"/>
+
+            <ListBox Name="lstConstraints" Grid.Row="1" Margin="5"
+                     SelectionChanged="ConstraintSelected">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="LightGray" BorderThickness="0,0,0,1" 
+                                Padding="5" Margin="0,2">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding GetHumanReadableDescription}" 
+                                         FontSize="11" Foreground="DarkGray"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Priorità:" FontSize="10"/>
+                                    <Label Content="{Binding Priority}" FontSize="10" 
+                                          FontWeight="Bold" Foreground="Blue"/>
+                                    <CheckBox IsChecked="{Binding IsActive}" 
+                                            Content="Attivo" FontSize="10" 
+                                            Margin="10,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5">
+                <Button Name="btnRemoveConstraint" Content="Rimuovi" Width="70" 
+                       Click="RemoveConstraint_Click" IsEnabled="False"/>
+                <Button Name="btnClearAll" Content="Pulisci Tutto" Width="80" 
+                       Margin="5,0,0,0" Click="ClearAll_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Editor vincoli a destra -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Content="Crea Nuovo Vincolo" FontWeight="Bold" Margin="5"/>
+
+            <TabControl Grid.Row="1" Margin="5">
+                <!-- Vincoli Docente -->
+                <TabItem Header="Vincoli Docente">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="10">
+                            <!-- Selezione docente -->
+                            <GroupBox Header="Seleziona Docente" Margin="0,0,0,10">
+                                <StackPanel Margin="10">
+                                    <ComboBox Name="cmbTeacher" Width="250" HorizontalAlignment="Left"
+                                            SelectionChanged="TeacherSelected">
+                                        <!-- Popolato con i docenti importati -->
+                                    </ComboBox>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <!-- Disponibilità -->
+                            <GroupBox Header="Disponibilità" Margin="0,0,0,10">
+                                <StackPanel Margin="10">
+                                    <Label Content="Seleziona gli slot NON disponibili:"/>
+                                    <Grid Name="grdAvailability" Margin="0,10,0,0">
+                                        <!-- Generato dinamicamente nel code-behind -->
+                                    </Grid>
+                                    <Button Name="btnAddAvailability" Content="Aggiungi Vincolo Disponibilità" 
+                                           Width="180" HorizontalAlignment="Left" Margin="0,10,0,0"
+                                           Click="AddAvailabilityConstraint_Click"/>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <!-- Ore giornaliere -->
+                            <GroupBox Header="Ore Giornaliere" Margin="0,0,0,10">
+                                <StackPanel Margin="10">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Massimo ore al giorno:"/>
+                                        <ComboBox Name="cmbMaxDailyHoursTeacher" Width="60">
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                            <ComboBoxItem Content="6" IsSelected="True"/>
+                                            <ComboBoxItem Content="7"/>
+                                            <ComboBoxItem Content="8"/>
+                                        </ComboBox>
+                                        <Label Content="Priorità:" Margin="20,0,5,0"/>
+                                        <ComboBox Name="cmbMaxDailyPriority" Width="100">
+                                            <ComboBoxItem Content="Mandatory" Tag="1000"/>
+                                            <ComboBoxItem Content="High" Tag="100" IsSelected="True"/>
+                                            <ComboBoxItem Content="Medium" Tag="10"/>
+                                            <ComboBoxItem Content="Low" Tag="1"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <Button Name="btnAddMaxDaily" Content="Aggiungi Vincolo Ore Giornaliere" 
+                                           Width="200" HorizontalAlignment="Left" Margin="0,10,0,0"
+                                           Click="AddMaxDailyConstraint_Click"/>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <!-- Ore buche -->
+                            <GroupBox Header="Ore Buche Settimanali" Margin="0,0,0,10">
+                                <StackPanel Margin="10">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Massimo ore buche settimanali:"/>
+                                        <ComboBox Name="cmbMaxWeeklyGaps" Width="60">
+                                            <ComboBoxItem Content="0"/>
+                                            <ComboBoxItem Content="1"/>
+                                            <ComboBoxItem Content="2"/>
+                                            <ComboBoxItem Content="3" IsSelected="True"/>
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                        </ComboBox>
+                                        <Label Content="Priorità:" Margin="20,0,5,0"/>
+                                        <ComboBox Name="cmbGapsPriority" Width="100">
+                                            <ComboBoxItem Content="High" Tag="100"/>
+                                            <ComboBoxItem Content="Medium" Tag="10" IsSelected="True"/>
+                                            <ComboBoxItem Content="Low" Tag="1"/>
+                                            <ComboBoxItem Content="Wish" Tag="0"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <Button Name="btnAddGapsConstraint" Content="Aggiungi Vincolo Ore Buche" 
+                                           Width="180" HorizontalAlignment="Left" Margin="0,10,0,0"
+                                           Click="AddGapsConstraint_Click"/>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <!-- Giorno libero -->
+                            <GroupBox Header="Giorno Libero" Margin="0,0,0,10">
+                                <StackPanel Margin="10">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Giorno libero:"/>
+                                        <ComboBox Name="cmbDayOff" Width="120">
+                                            <ComboBoxItem Content="Lunedì" Tag="Monday"/>
+                                            <ComboBoxItem Content="Martedì" Tag="Tuesday"/>
+                                            <ComboBoxItem Content="Mercoledì" Tag="Wednesday"/>
+                                            <ComboBoxItem Content="Giovedì" Tag="Thursday"/>
+                                            <ComboBoxItem Content="Venerdì" Tag="Friday"/>
+                                            <ComboBoxItem Content="Sabato" Tag="Saturday"/>
+                                        </ComboBox>
+                                        <Label Content="Priorità:" Margin="20,0,5,0"/>
+                                        <ComboBox Name="cmbDayOffPriority" Width="100">
+                                            <ComboBoxItem Content="Mandatory" Tag="1000"/>
+                                            <ComboBoxItem Content="High" Tag="100" IsSelected="True"/>
+                                            <ComboBoxItem Content="Medium" Tag="10"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <Button Name="btnAddDayOff" Content="Aggiungi Giorno Libero" 
+                                           Width="150" HorizontalAlignment="Left" Margin="0,10,0,0"
+                                           Click="AddDayOff_Click"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Vincoli Classe -->
+                <TabItem Header="Vincoli Classe">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="10">
+                            <!-- Selezione classe -->
+                            <GroupBox Header="Seleziona Classe" Margin="0,0,0,10">
+                                <StackPanel Margin="10">
+                                    <ComboBox Name="cmbClass" Width="150" HorizontalAlignment="Left"
+                             SelectionChanged="ClassSelected">
+                                        <!-- Popolato con le classi importate -->
+                                    </ComboBox>
+                                    <TextBlock Name="txtClassInfo" Margin="0,10,0,0" FontStyle="Italic"/>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <!-- Ore giornaliere specifiche -->
+                            <GroupBox Header="Ore Specifiche per Giorno" Margin="0,0,0,10">
+                                <StackPanel Margin="10">
+                                    <TextBlock Text="Forza la classe a fare un numero specifico di ore in un giorno"
+                              TextWrapping="Wrap" Margin="0,0,0,10" FontStyle="Italic"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="Giorno:"/>
+                                        <ComboBox Name="cmbClassDay" Width="120">
+                                            <ComboBoxItem Content="Lunedì" Tag="Monday"/>
+                                            <ComboBoxItem Content="Martedì" Tag="Tuesday"/>
+                                            <ComboBoxItem Content="Mercoledì" Tag="Wednesday"/>
+                                            <ComboBoxItem Content="Giovedì" Tag="Thursday"/>
+                                            <ComboBoxItem Content="Venerdì" Tag="Friday"/>
+                                            <ComboBoxItem Content="Sabato" Tag="Saturday"/>
+                                        </ComboBox>
+                                        <Label Content="Ore:" Margin="10,0,5,0"/>
+                                        <ComboBox Name="cmbClassHours" Width="60">
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                            <ComboBoxItem Content="6" IsSelected="True"/>
+                                            <ComboBoxItem Content="7"/>
+                                            <ComboBoxItem Content="8"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <Button Name="btnAddClassDailyHours" Content="Aggiungi Vincolo Ore Giornaliere" 
+                           Width="200" HorizontalAlignment="Left" Margin="0,10,0,0"
+                           Click="AddClassDailyHours_Click" IsEnabled="False"/>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <!-- Distribuzione settimanale -->
+                            <GroupBox Header="Distribuzione Settimanale Completa" Margin="0,0,0,10">
+                                <StackPanel Margin="10">
+                                    <TextBlock Text="Definisci esattamente quante ore per ogni giorno della settimana"
+                              TextWrapping="Wrap" Margin="0,0,0,10" FontStyle="Italic"/>
+                                    <Grid Name="grdWeeklyDistribution">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="60"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label Content="Lunedì:" Grid.Row="0" Grid.Column="0"/>
+                                        <ComboBox Name="cmbMonday" Grid.Row="0" Grid.Column="1">
+                                            <ComboBoxItem Content="0"/>
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                            <ComboBoxItem Content="6" IsSelected="True"/>
+                                            <ComboBoxItem Content="7"/>
+                                            <ComboBoxItem Content="8"/>
+                                        </ComboBox>
+
+                                        <Label Content="Martedì:" Grid.Row="0" Grid.Column="2"/>
+                                        <ComboBox Name="cmbTuesday" Grid.Row="0" Grid.Column="3">
+                                            <ComboBoxItem Content="0"/>
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                            <ComboBoxItem Content="6" IsSelected="True"/>
+                                            <ComboBoxItem Content="7"/>
+                                            <ComboBoxItem Content="8"/>
+                                        </ComboBox>
+
+                                        <Label Content="Mercoledì:" Grid.Row="0" Grid.Column="4"/>
+                                        <ComboBox Name="cmbWednesday" Grid.Row="0" Grid.Column="5">
+                                            <ComboBoxItem Content="0"/>
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                            <ComboBoxItem Content="6" IsSelected="True"/>
+                                            <ComboBoxItem Content="7"/>
+                                            <ComboBoxItem Content="8"/>
+                                        </ComboBox>
+
+                                        <Label Content="Giovedì:" Grid.Row="1" Grid.Column="0"/>
+                                        <ComboBox Name="cmbThursday" Grid.Row="1" Grid.Column="1">
+                                            <ComboBoxItem Content="0"/>
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                            <ComboBoxItem Content="6" IsSelected="True"/>
+                                            <ComboBoxItem Content="7"/>
+                                            <ComboBoxItem Content="8"/>
+                                        </ComboBox>
+
+                                        <Label Content="Venerdì:" Grid.Row="1" Grid.Column="2"/>
+                                        <ComboBox Name="cmbFriday" Grid.Row="1" Grid.Column="3">
+                                            <ComboBoxItem Content="0"/>
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                            <ComboBoxItem Content="6" IsSelected="True"/>
+                                            <ComboBoxItem Content="7"/>
+                                            <ComboBoxItem Content="8"/>
+                                        </ComboBox>
+
+                                        <Label Content="Sabato:" Grid.Row="1" Grid.Column="4"/>
+                                        <ComboBox Name="cmbSaturday" Grid.Row="1" Grid.Column="5">
+                                            <ComboBoxItem Content="0" IsSelected="True"/>
+                                            <ComboBoxItem Content="4"/>
+                                            <ComboBoxItem Content="5"/>
+                                            <ComboBoxItem Content="6"/>
+                                            <ComboBoxItem Content="7"/>
+                                            <ComboBoxItem Content="8"/>
+                                        </ComboBox>
+                                    </Grid>
+                                    <TextBlock Name="txtTotalHours" Margin="0,10,0,0" FontWeight="Bold"/>
+                                    <Button Name="btnAddWeeklyDistribution" Content="Aggiungi Distribuzione Settimanale" 
+                           Width="220" HorizontalAlignment="Left" Margin="0,10,0,0"
+                           Click="AddWeeklyDistribution_Click" IsEnabled="False"/>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Editor Avanzato -->
+                <TabItem Header="Editor Avanzato">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" TextWrapping="Wrap" Margin="0,0,0,10">
+                            Scrivi vincoli usando il linguaggio di scripting. Esempi:
+                            <LineBreak/>
+                            • IF Teacher="Rossi" AND Day="Monday" THEN Hour!=1
+                            <LineBreak/>
+                            • IF Class="3AA" THEN DailyHours BETWEEN 5 AND 6
+                        </TextBlock>
+
+                        <TextBox Name="txtAdvancedEditor" Grid.Row="1" 
+                                AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                                FontFamily="Consolas"/>
+
+                        <Button Name="btnParseAdvanced" Grid.Row="2" 
+                               Content="Analizza e Aggiungi" Width="150" 
+                               HorizontalAlignment="Left" Margin="0,10,0,0"
+                               Click="ParseAdvanced_Click"/>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
+            <!-- Pulsanti azione -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" 
+                       HorizontalAlignment="Right" Margin="5">
+                <Button Name="btnSaveConstraints" Content="Salva Vincoli" Width="100" 
+                       Click="SaveConstraints_Click"/>
+                <Button Name="btnLoadConstraints" Content="Carica Vincoli" Width="100" 
+                       Margin="5,0,0,0" Click="LoadConstraints_Click"/>
+                <Button Name="btnClose" Content="Chiudi" Width="80" 
+                       Margin="20,0,0,0" Click="Close_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
